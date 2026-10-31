@@ -1,0 +1,1650 @@
+{
+  "info": {
+    "name": "Hospital Expo Backend - Postman Tests",
+    "description": "Test collection for the Express/Mongoose hospital management backend rebuilt from expo.docx. Seed the admin and start MongoDB/API first. Edit the collection variables before running. For duplicate-registration conflicts, use fresh emails/ID card values or reuse already-created accounts and log in directly.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Health, Registration & Login",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            },
+            "description": "No token required."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API is healthy', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Creates a patient account. Registration always starts with the patient role.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{patientName}}\",\n  \"email\": \"{{patientEmail}}\",\n  \"password\": \"{{patientPassword}}\",\n  \"idCardNumber\": \"{{patientIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Patient registration returns 201 or already exists', () => pm.expect([201,409]).to.include(pm.response.code));",
+                  "if (pm.response.code === 201) { const j=pm.response.json(); pm.collectionVariables.set('patientId', j.user.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Doctor Account (initially patient)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register this account, then promote it with the admin request below.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{doctorName}}\",\n  \"email\": \"{{doctorEmail}}\",\n  \"password\": \"{{doctorPassword}}\",\n  \"idCardNumber\": \"{{doctorIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Account registered or already exists', () => pm.expect([201,409]).to.include(pm.response.code));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('doctorId', pm.response.json().user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Medicine Manager Account (initially patient)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{medicineManagerName}}\",\n  \"email\": \"{{medicineManagerEmail}}\",\n  \"password\": \"{{medicineManagerPassword}}\",\n  \"idCardNumber\": \"{{medicineManagerIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Account registered or already exists', () => pm.expect([201,409]).to.include(pm.response.code));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('medicineManagerId', pm.response.json().user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Lab Manager Account (initially patient)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{labManagerName}}\",\n  \"email\": \"{{labManagerEmail}}\",\n  \"password\": \"{{labManagerPassword}}\",\n  \"idCardNumber\": \"{{labManagerIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Account registered or already exists', () => pm.expect([201,409]).to.include(pm.response.code));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('labManagerId', pm.response.json().user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Create the admin in terminal first with npm run seed:admin. Values must match your .env.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\",\n  \"idCardNumber\": \"{{adminIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Admin login succeeded', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) { const j=pm.response.json(); pm.collectionVariables.set('adminToken', j.token); pm.collectionVariables.set('adminId', j.user.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{patientEmail}}\",\n  \"password\": \"{{patientPassword}}\",\n  \"idCardNumber\": \"{{patientIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Patient login succeeded', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) { const j=pm.response.json(); pm.collectionVariables.set('patientToken', j.token); pm.collectionVariables.set('patientId', j.user.id); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Admin & Role Setup",
+      "item": [
+        {
+          "name": "Promote Doctor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "role"
+              ]
+            },
+            "description": "Admin-only. Requires a registered account.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{doctorEmail}}\",\n  \"role\": \"doctor\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Role update succeeded', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.collectionVariables.set('doctorId', pm.response.json().user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Promote Medicine Manager",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "role"
+              ]
+            },
+            "description": "Admin-only. Requires a registered account.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{medicineManagerEmail}}\",\n  \"role\": \"medicine_manager\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Role update succeeded', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.collectionVariables.set('medicineManagerId', pm.response.json().user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Promote Lab Manager",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "role"
+              ]
+            },
+            "description": "Admin-only. Requires a registered account.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{labManagerEmail}}\",\n  \"role\": \"diagnosis_lab_manager\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Role update succeeded', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.collectionVariables.set('labManagerId', pm.response.json().user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Search User By Email",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users?email={{doctorEmail}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users?email={{doctorEmail}}"
+              ]
+            },
+            "description": "Change doctorEmail in collection variables to search another account."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Search response returned', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Doctor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{doctorEmail}}\",\n  \"password\": \"{{doctorPassword}}\",\n  \"idCardNumber\": \"{{doctorIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Doctor login succeeded after role assignment', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) { const j=pm.response.json(); pm.collectionVariables.set('doctorToken', j.token); pm.collectionVariables.set('doctorId', j.user.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Medicine Manager",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{medicineManagerEmail}}\",\n  \"password\": \"{{medicineManagerPassword}}\",\n  \"idCardNumber\": \"{{medicineManagerIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Medicine manager login succeeded after role assignment', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) { const j=pm.response.json(); pm.collectionVariables.set('medicineManagerToken', j.token); pm.collectionVariables.set('medicineManagerId', j.user.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Lab Manager",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{labManagerEmail}}\",\n  \"password\": \"{{labManagerPassword}}\",\n  \"idCardNumber\": \"{{labManagerIdCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Lab manager login succeeded after role assignment', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) { const j=pm.response.json(); pm.collectionVariables.set('labManagerToken', j.token); pm.collectionVariables.set('labManagerId', j.user.id); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Doctor Availability & Bookings",
+      "item": [
+        {
+          "name": "Doctor Create Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/slots/availability",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "slots",
+                "availability"
+              ]
+            },
+            "description": "Creates a four-hour availability window with 10-minute slots (24 slots). Use a future date.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"{{startTime}}\",\n  \"endTime\": \"{{endTime}}\",\n  \"slotDurationMinutes\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const start = new Date(Date.now() + 48 * 60 * 60 * 1000);",
+                  "start.setUTCMinutes(0, 0, 0);",
+                  "start.setUTCHours(start.getUTCHours() + 1);",
+                  "const end = new Date(start.getTime() + 4 * 60 * 60 * 1000);",
+                  "pm.collectionVariables.set('startTime', start.toISOString());",
+                  "pm.collectionVariables.set('endTime', end.toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Availability created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patient List Doctors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/slots/doctors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "slots",
+                "doctors"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Doctor list returned', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patient List Doctor Slots",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/slots/doctors/{{doctorId}}/slots?from={{startTime}}&to={{endTime}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "slots",
+                "doctors",
+                "{{doctorId}}",
+                "slots?from={{startTime}}&to={{endTime}}"
+              ]
+            },
+            "description": "Finds available slots during the window created above."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Slots returned', () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200 && pm.response.json().slots.length) pm.collectionVariables.set('slotId', pm.response.json().slots[0]._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patient Book First Slot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bookings"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slotId\": \"{{slotId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Appointment booked', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patient My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bookings",
+                "my"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Patient bookings returned', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Doctor My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bookings",
+                "my"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Doctor bookings returned', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patient Cancel Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/{{slotId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bookings",
+                "{{slotId}}",
+                "cancel"
+              ]
+            },
+            "description": "Optional test. Cancels the booking and makes the slot bookable again."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Booking cancelled', () => pm.expect([200,404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Doctor Update Available Slot (optional; run after patient cancellation)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"{{updatedStartTime}}\",\n  \"endTime\": \"{{updatedEndTime}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/slots/slots/{{slotId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "slots",
+                "slots",
+                "{{slotId}}"
+              ]
+            },
+            "description": "Optional: run after Patient Cancel Booking. Moves the available 30-minute slot one day later without overlapping the original availability."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const start = new Date(new Date(pm.collectionVariables.get('startTime')).getTime() + 24 * 60 * 60 * 1000);",
+                  "const end = new Date(start.getTime() + 30 * 60 * 1000);",
+                  "pm.collectionVariables.set('updatedStartTime', start.toISOString());",
+                  "pm.collectionVariables.set('updatedEndTime', end.toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Available slot updated', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Medicine Inventory",
+      "item": [
+        {
+          "name": "Medicine Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{medicineManagerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/medicines",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medicines"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Paracetamol 500mg\",\n  \"genericName\": \"Paracetamol\",\n  \"category\": \"Analgesic\",\n  \"batchNumber\": \"PM-BATCH-001\",\n  \"quantity\": 100,\n  \"reorderLevel\": 20,\n  \"expiryDate\": \"2028-12-31T00:00:00.000Z\",\n  \"isActive\": true,\n  \"unit\": \"tablet\",\n  \"manufacturer\": \"Example Pharma\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Medicine created', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('medicineId', pm.response.json().medicine._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Medicine List (patient-readable stock)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/medicines?search=Paracetamol",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medicines?search=Paracetamol"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Medicine list returned', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Medicine Low Stock",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/medicines/low-stock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medicines",
+                "low-stock"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Medicine Add Stock",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{medicineManagerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/medicines/{{medicineId}}/stock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medicines",
+                "{{medicineId}}",
+                "stock"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"add\",\n  \"amount\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Stock update succeeded', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Medicine Remove Stock",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{medicineManagerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/medicines/{{medicineId}}/stock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medicines",
+                "{{medicineId}}",
+                "stock"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"remove\",\n  \"amount\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Stock update succeeded', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 - Lab Reports & Prescriptions",
+      "item": [
+        {
+          "name": "Lab Upload Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{labManagerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/lab-reports",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "records",
+                "lab-reports"
+              ]
+            },
+            "description": "Select a demo file in Body \u2192 form-data. If reportType is chest_xray, the optional FastAPI model is called.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "idCardNumber",
+                  "value": "{{patientIdCardNumber}}",
+                  "type": "text"
+                },
+                {
+                  "key": "reportType",
+                  "value": "chest_xray",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Demo Chest X-ray",
+                  "type": "text"
+                },
+                {
+                  "key": "diagnosis",
+                  "value": "Awaiting clinician review",
+                  "type": "text"
+                },
+                {
+                  "key": "notes",
+                  "value": "Postman demo only",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Upload succeeded or expected setup/file issue', () => pm.expect([201,400,404,500]).to.include(pm.response.code));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('labRecordId', pm.response.json().record._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lab Update Latest Report By Card",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{labManagerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/lab-reports/by-card/{{patientIdCardNumber}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "records",
+                "lab-reports",
+                "by-card",
+                "{{patientIdCardNumber}}"
+              ]
+            },
+            "description": "Can be sent as form-data without attaching a file to update notes/title only.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "notes",
+                  "value": "Updated using Postman",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Lab report updated or upload must be done first', () => pm.expect([200,404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Doctor Create Prescription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/prescriptions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "records",
+                "prescriptions"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCardNumber\": \"{{patientIdCardNumber}}\",\n  \"title\": \"Postman demo prescription\",\n  \"diagnosis\": \"Demo consultation note\",\n  \"notes\": \"For API testing only. Not medical advice.\",\n  \"medicines\": [\n    {\n      \"name\": \"Paracetamol 500mg\",\n      \"dosage\": \"1 tablet\",\n      \"frequency\": \"As prescribed\",\n      \"duration\": \"3 days\",\n      \"instructions\": \"After food\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Prescription saved', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patient My Medical Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "records",
+                "my"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Patient records returned', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Doctor View Patient History By Card",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/patient/{{patientIdCardNumber}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "records",
+                "patient",
+                "{{patientIdCardNumber}}"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Patient history returned', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Download Lab Report File",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/{{labRecordId}}/file",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "records",
+                "{{labRecordId}}",
+                "file"
+              ]
+            },
+            "description": "Run after Lab Upload Report succeeds; access is checked against the patient owner."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@example.com",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "ChangeThisAdminPassword123!",
+      "type": "string"
+    },
+    {
+      "key": "adminIdCardNumber",
+      "value": "ADMIN-001",
+      "type": "string"
+    },
+    {
+      "key": "patientName",
+      "value": "Test Patient",
+      "type": "string"
+    },
+    {
+      "key": "patientEmail",
+      "value": "patient@example.com",
+      "type": "string"
+    },
+    {
+      "key": "patientPassword",
+      "value": "TestPatient123!",
+      "type": "string"
+    },
+    {
+      "key": "patientIdCardNumber",
+      "value": "PAT-10001",
+      "type": "string"
+    },
+    {
+      "key": "doctorName",
+      "value": "Test Doctor",
+      "type": "string"
+    },
+    {
+      "key": "doctorEmail",
+      "value": "doctor@example.com",
+      "type": "string"
+    },
+    {
+      "key": "doctorPassword",
+      "value": "TestDoctor123!",
+      "type": "string"
+    },
+    {
+      "key": "doctorIdCardNumber",
+      "value": "DOC-10001",
+      "type": "string"
+    },
+    {
+      "key": "medicineManagerName",
+      "value": "Test Medicine Manager",
+      "type": "string"
+    },
+    {
+      "key": "medicineManagerEmail",
+      "value": "pharmacy@example.com",
+      "type": "string"
+    },
+    {
+      "key": "medicineManagerPassword",
+      "value": "Pharmacy123!",
+      "type": "string"
+    },
+    {
+      "key": "medicineManagerIdCardNumber",
+      "value": "MED-10001",
+      "type": "string"
+    },
+    {
+      "key": "labManagerName",
+      "value": "Test Lab Manager",
+      "type": "string"
+    },
+    {
+      "key": "labManagerEmail",
+      "value": "lab@example.com",
+      "type": "string"
+    },
+    {
+      "key": "labManagerPassword",
+      "value": "LabStaff123!",
+      "type": "string"
+    },
+    {
+      "key": "labManagerIdCardNumber",
+      "value": "LAB-10001",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "doctorToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicineManagerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "labManagerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "doctorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicineManagerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "labManagerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "slotId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicineId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "labRecordId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "startTime",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "endTime",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "updatedStartTime",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "updatedEndTime",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
