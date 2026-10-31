@@ -19,11 +19,7 @@ Open a terminal in this project folder:
 npm install
 ```
 
-Copy `.env.example` to `.env`. On Windows PowerShell:
 
-```powershell
-Copy-Item .env.example .env
-```
 
 Edit `.env`, especially `MONGODB_URI`, `JWT_SECRET`, and the admin credentials. Use a private JWT secret with at least 32 characters. The `.env` file is ignored by Git and must not be shared.
 
